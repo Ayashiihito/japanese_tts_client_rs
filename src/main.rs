@@ -1,35 +1,24 @@
 use std::error::Error;
-use std::path::Path;
+use std::io;
 use std::time::SystemTime;
-use std::{fs, io};
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use clipboard_master::{CallbackResult, ClipboardHandler, Master};
-use crypto::digest::Digest;
-use crypto::sha1::Sha1;
 use regex::Regex;
 
 mod api;
+mod fs_cache;
 mod playback;
 
-static STORAGE_DIR: &'static str = "./audio_cache";
-
-fn speak(text: &str) -> Result<(), Box<dyn Error>> {
+fn play(text: &str) -> Result<(), Box<dyn Error>> {
     let function_start = SystemTime::now();
 
-    let mut hasher = Sha1::new();
-    hasher.input_str(text);
-    let hex = hasher.result_str();
-    let path_string = format!("{}/{}.wav", &STORAGE_DIR, hex);
-    let file_path = Path::new(&path_string);
-    let audio_bytes;
-
-    if !file_path.exists() {
-        audio_bytes = api::get_audio_bytes(text)?;
-        fs::write(&file_path, &audio_bytes)?
+    let audio_bytes = if fs_cache::has(&text) {
+        fs_cache::get(&text)
     } else {
-        audio_bytes = fs::read(&file_path)?
-    }
+        fs_cache::set(&text, &api::get_audio_bytes(text)?)
+    }?;
+
     println!("Time elapsed: {:?}", function_start.elapsed());
 
     playback::play_audio(&audio_bytes)?;
@@ -56,7 +45,7 @@ impl ClipboardHandler for Handler {
         if is_japanese.is_match(&text) {
             println!("{}", text);
 
-            match speak(&text.trim()) {
+            match play(&text.trim()) {
                 Err(error) => {
                     eprintln!("There was an error: {}", error)
                 }
@@ -74,7 +63,7 @@ impl ClipboardHandler for Handler {
 }
 
 pub fn main() {
-    fs::create_dir_all(&STORAGE_DIR).expect("Failed to create audio storage directory");
+    fs_cache::init();
     println!("Listening for clipboard changes...");
     let _ = Master::new(Handler).run();
 }
