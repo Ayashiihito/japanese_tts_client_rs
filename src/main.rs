@@ -4,13 +4,14 @@ use std::time::SystemTime;
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use clipboard_master::{CallbackResult, ClipboardHandler, Master};
-use regex::Regex;
 
 mod api;
 mod fs_cache;
 mod playback;
+mod util;
 
 fn play(text: &str) -> Result<(), Box<dyn Error>> {
+    println!("{}", text);
     let function_start = SystemTime::now();
 
     let audio_bytes = if fs_cache::has(&text) {
@@ -38,13 +39,7 @@ impl ClipboardHandler for Handler {
             }
         };
 
-        let is_japanese =
-            Regex::new(r"[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f]")
-                .unwrap();
-
-        if is_japanese.is_match(&text) {
-            println!("{}", text);
-
+        if util::is_japanese(&text) {
             match play(&text.trim()) {
                 Err(error) => {
                     eprintln!("There was an error: {}", error)
