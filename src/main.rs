@@ -58,7 +58,7 @@ impl ClipboardHandler for Handler {
         if is_japanese.is_match(&text) {
             println!("{}", text);
 
-            match speak(&text) {
+            match speak(&text.trim()) {
                 Err(error) => {
                     eprintln!("There was an error: {}", error)
                 }
