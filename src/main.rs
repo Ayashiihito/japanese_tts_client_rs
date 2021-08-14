@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::path::Path;
 use std::time::SystemTime;
 use std::{fs, io};
@@ -13,7 +14,7 @@ mod playback;
 
 static STORAGE_DIR: &'static str = "./audio_cache";
 
-fn speak(text: &str) -> () {
+fn speak(text: &str) -> Result<(), Box<dyn Error>> {
     let mut hasher = Sha1::new();
     hasher.input_str(text);
     let hex = hasher.result_str();
@@ -23,17 +24,19 @@ fn speak(text: &str) -> () {
 
     if !file_path.exists() {
         let now = SystemTime::now();
-        audio_bytes = api::get_audio_bytes(text);
+        audio_bytes = api::get_audio_bytes(text)?;
         let duration = now.elapsed();
         println!("Time elapsed: {:?}", duration);
 
-        fs::write(&file_path, &audio_bytes).expect("Failed to write to storage");
+        fs::write(&file_path, &audio_bytes)?
     } else {
-        audio_bytes = fs::read(&file_path).expect("Failed to read file");
+        audio_bytes = fs::read(&file_path)?
     }
 
-    let cursor = playback::bytes_to_cursor(&audio_bytes);
-    playback::play_audio(cursor);
+    let cursor = playback::bytes_to_cursor(&audio_bytes)?;
+    playback::play_audio(cursor)?;
+
+    Ok(())
 }
 
 struct Handler;
@@ -47,7 +50,13 @@ impl ClipboardHandler for Handler {
 
         if is_japanese.is_match(&text) {
             println!("{}", text);
-            speak(&text);
+
+            match speak(&text) {
+                Err(error) => {
+                    println!("There was an error: {}", error)
+                }
+                _ => {}
+            }
         }
 
         CallbackResult::Next

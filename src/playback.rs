@@ -1,21 +1,21 @@
+use std::error::Error;
 use std::io::{Cursor, Seek, SeekFrom, Write};
 
 use rodio::OutputStream;
 
-pub fn play_audio(cursor: Cursor<Vec<u8>>) {
-  let (_stream, stream_handle) =
-    OutputStream::try_default().expect("Failed to create output stream");
-  let sink = stream_handle
-    .play_once(cursor)
-    .expect("Failed to play audio");
+pub fn play_audio(cursor: Cursor<Vec<u8>>) -> Result<(), Box<dyn Error>> {
+  let (_stream, stream_handle) = OutputStream::try_default()?;
+
+  let sink = stream_handle.play_once(cursor)?;
   sink.sleep_until_end();
+
+  Ok(())
 }
 
-pub fn bytes_to_cursor(sound_bytes: &[u8]) -> Cursor<Vec<u8>> {
-  let mut c = Cursor::new(Vec::new());
-  c.write_all(&sound_bytes)
-    .expect("Failed to read sound file data");
-  c.seek(SeekFrom::Start(0))
-    .expect("Failed to seek to start of buffer");
-  c
+pub fn bytes_to_cursor(sound_bytes: &[u8]) -> Result<Cursor<Vec<u8>>, Box<dyn Error>> {
+  let mut cursor = Cursor::new(Vec::new());
+  cursor.write_all(&sound_bytes)?;
+  cursor.seek(SeekFrom::Start(0))?;
+
+  Ok(cursor)
 }
