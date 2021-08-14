@@ -19,20 +19,20 @@ fn speak(text: &str) -> () {
     let hex = hasher.result_str();
     let path_string = format!("{}/{}.wav", &STORAGE_DIR, hex);
     let file_path = Path::new(&path_string);
-    let res_bytes;
+    let audio_bytes;
 
     if !file_path.exists() {
         let now = SystemTime::now();
-        res_bytes = api::get_audio(text);
+        audio_bytes = api::get_audio_bytes(text);
         let duration = now.elapsed();
         println!("Time elapsed: {:?}", duration);
 
-        fs::write(&file_path, &res_bytes).expect("Failed to write to storage");
+        fs::write(&file_path, &audio_bytes).expect("Failed to write to storage");
     } else {
-        res_bytes = fs::read(&file_path).expect("Failed to read file");
+        audio_bytes = fs::read(&file_path).expect("Failed to read file");
     }
 
-    let cursor = playback::bytes_to_cursor(&res_bytes);
+    let cursor = playback::bytes_to_cursor(&audio_bytes);
     playback::play_audio(cursor);
 }
 
