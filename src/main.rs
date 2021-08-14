@@ -76,6 +76,7 @@ impl ClipboardHandler for Handler {
 }
 
 pub fn main() {
+    fs::create_dir_all(&STORAGE_DIR).expect("Failed to create directory");
+    println!("Listening for clipboard changes...");
     let _ = Master::new(Handler).run();
-    println!("Listening for clipboard changes...")
 }
