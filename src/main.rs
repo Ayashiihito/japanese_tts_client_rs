@@ -32,9 +32,7 @@ fn speak(text: &str) -> Result<(), Box<dyn Error>> {
     }
     println!("Time elapsed: {:?}", function_start.elapsed());
 
-    let cursor = playback::bytes_to_cursor(&audio_bytes)?;
-    playback::play_audio(cursor)?;
-
+    playback::play_audio(&audio_bytes)?;
     Ok(())
 }
 
@@ -76,7 +74,7 @@ impl ClipboardHandler for Handler {
 }
 
 pub fn main() {
-    fs::create_dir_all(&STORAGE_DIR).expect("Failed to create directory");
+    fs::create_dir_all(&STORAGE_DIR).expect("Failed to create audio storage directory");
     println!("Listening for clipboard changes...");
     let _ = Master::new(Handler).run();
 }
