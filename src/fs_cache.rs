@@ -19,6 +19,7 @@ fn get_file_path(key: &str) -> String {
   format!("{}/{}.wav", &STORAGE_DIR, key_hash)
 }
 
+//TODO should be generic
 pub fn get(key: &str) -> io::Result<Vec<u8>> {
   let file_path = get_file_path(key);
   fs::read(Path::new(&file_path))
