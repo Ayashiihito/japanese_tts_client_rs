@@ -1,0 +1,15 @@
+[package]
+name = "ttsr"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+rust-crypto = "0.2.36"
+cacache = "8.0.0"
+clipboard-master = "3.1.1"
+clipboard = "0.5.0"
+rodio = "0.14.0"
+regex = "1"

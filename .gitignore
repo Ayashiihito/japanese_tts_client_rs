@@ -1,0 +1,4 @@
+/.vscode
+/target
+/audio_cache/*
+!/audio_cache/.gitkeep
