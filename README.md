@@ -1,4 +1,4 @@
-# jttsr client
+# jtts client
 
 is a program that uses machine learning text-to-speech to say aloud any Japanese text that you copy into the clipboard.  
 You need an instance of [jtts server](https://github.com/Ayashiihito/japanese_tts_server) running for it to work.
