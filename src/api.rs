@@ -9,7 +9,12 @@ pub fn get_audio_bytes(text: &str) -> Result<std::vec::Vec<u8>, Box<dyn Error>> 
     let mut json_body = HashMap::new();
     json_body.insert("text", text);
 
-    let res = Client::new()
+    //TODO: don't create client on each request
+    let client = Client::builder()
+        .timeout(std::time::Duration::from_secs(300))
+        .build()?;
+
+    let res = client
         .post(API_URI)
         .json(&json_body)
         .send()?
