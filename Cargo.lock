@@ -151,21 +151,21 @@ dependencies = [
  "objc",
  "objc-foundation",
  "objc_id",
- "x11-clipboard",
+ "x11-clipboard 0.3.3",
 ]
 
 [[package]]
 name = "clipboard-master"
-version = "3.1.1"
+version = "3.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92686a05590a906253595bc1ae71b86a0936c89ad12ecf45760030f11e33567a"
+checksum = "1cd1cb2f0df685eb4a61c656faeb6ef391ad776943d3723afb12bdcbceff824d"
 dependencies = [
  "objc",
  "objc-foundation",
  "objc_id",
  "winapi",
  "windows-win",
- "x11-clipboard",
+ "x11-clipboard 0.5.3",
 ]
 
 [[package]]
@@ -1093,6 +1093,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-xml"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8533f14c8382aaad0d592c812ac3b826162128b65662331e1127b45c3d18536b"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1798,7 +1807,16 @@ version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "89bd49c06c9eb5d98e6ba6536cf64ac9f7ee3a009b2f53996d405b3944f6bcea"
 dependencies = [
- "xcb",
+ "xcb 0.8.2",
+]
+
+[[package]]
+name = "x11-clipboard"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "473068b7b80ac86a18328824f1054e5e007898c47b5bbc281bd7abe32bc3653c"
+dependencies = [
+ "xcb 0.10.1",
 ]
 
 [[package]]
@@ -1809,4 +1827,15 @@ checksum = "5e917a3f24142e9ff8be2414e36c649d47d6cc2ba81f16201cdef96e533e02de"
 dependencies = [
  "libc",
  "log",
+]
+
+[[package]]
+name = "xcb"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "771e2b996df720cd1c6dd9ff90f62d91698fd3610cc078388d0564bdd6622a9c"
+dependencies = [
+ "libc",
+ "log",
+ "quick-xml",
 ]
