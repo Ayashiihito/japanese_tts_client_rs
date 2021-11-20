@@ -4,10 +4,10 @@ use std::{fs, io};
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
 
-pub static STORAGE_DIR: &'static str = "./audio_cache";
+use crate::settings::SETTINGS;
 
 pub fn init() {
-    fs::create_dir_all(&STORAGE_DIR).expect("Failed to create audio storage directory");
+    fs::create_dir_all(&SETTINGS.storage_dir).expect("Failed to create audio storage directory");
 }
 
 // Calling it every time is definitely suboptimal,
@@ -16,7 +16,8 @@ fn get_file_path(key: &str) -> String {
     let mut hasher = Sha1::new();
     hasher.input_str(key);
     let key_hash = hasher.result_str();
-    format!("{}/{}.wav", &STORAGE_DIR, key_hash)
+
+    format!("{}/{}.wav", &SETTINGS.storage_dir, key_hash)
 }
 
 //TODO should be generic

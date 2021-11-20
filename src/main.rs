@@ -1,13 +1,18 @@
 use std::error::Error;
 use std::io;
+
 use std::time::SystemTime;
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use clipboard_master::{CallbackResult, ClipboardHandler, Master};
 
+#[macro_use]
+extern crate lazy_static;
+
 mod api;
 mod fs_cache;
 mod playback;
+mod settings;
 mod util;
 
 fn play(text: &str) -> Result<(), Box<dyn Error>> {
