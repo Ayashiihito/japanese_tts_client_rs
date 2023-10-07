@@ -64,7 +64,7 @@ impl ClipboardHandler for Handler {
 
 pub fn main() {
     fs_cache::init();
+    fs_cache::remove_expired_items();
     println!("Listening for clipboard changes...");
     let _ = Master::new(Handler).run();
 }
-fs_cache::remove_expired_items();
