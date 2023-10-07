@@ -20,10 +20,10 @@ fn get_file_path(key: &str) -> String {
     format!("{}/{}.wav", &SETTINGS.storage_dir, key_hash)
 }
 
-//TODO should be generic
-pub fn get(key: &str) -> io::Result<Vec<u8>> {
+pub fn get<T: From<Vec<u8>>>(key: &str) -> io::Result<T> {
     let file_path = get_file_path(key);
-    fs::read(Path::new(&file_path))
+    let data = fs::read(Path::new(&file_path))?;
+    Ok(T::from(data))
 }
 
 pub fn has(key: &str) -> bool {
