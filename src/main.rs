@@ -19,11 +19,17 @@ fn play(text: &str) -> Result<(), Box<dyn Error>> {
     println!("{}", text);
     let function_start = SystemTime::now();
 
-    let audio_bytes = if fs_cache::has(&text) {
+    let mut audio_bytes = if fs_cache::has(&text) {
         fs_cache::get(&text)
     } else {
         fs_cache::set(&text, &api::get_audio_bytes(text)?)
-    }?;
+    };
+
+    if audio_bytes.is_err() {
+        audio_bytes = fs_cache::set(&text, &api::get_audio_bytes(text)?);
+    }
+
+    let audio_bytes = audio_bytes?;
 
     println!("Time elapsed: {:?}", function_start.elapsed());
 
