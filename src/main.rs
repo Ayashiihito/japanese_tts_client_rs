@@ -67,3 +67,4 @@ pub fn main() {
     println!("Listening for clipboard changes...");
     let _ = Master::new(Handler).run();
 }
+fs_cache::remove_expired_items();
