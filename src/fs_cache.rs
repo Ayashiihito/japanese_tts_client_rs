@@ -31,9 +31,33 @@ pub fn has(key: &str) -> bool {
     Path::new(&file_path).exists()
 }
 
-pub fn set<'a>(key: &str, value: &'a [u8]) -> io::Result<Vec<u8>> {
-    let file_path = get_file_path(key);
+pub fn set<'a>(&mut self, key: &str, value: &'a [u8]) -> io::Result<()> {
+    let file_path = self.get_file_path(key);
+    let value_size = value.len() as u64;
+
+    while self.size + value_size > SETTINGS.max_cache_size {
+        self.remove_oldest()?;
+    }
+
     fs::write(Path::new(&file_path), value)?;
 
-    Ok(value.to_vec())
+    self.size += value_size;
+    let expiration = SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() + SETTINGS.cache_expiration;
+    self.expiration.insert(key.to_string(), expiration);
+
+    Ok(())
+}
+
+fn remove_oldest(&mut self) -> io::Result<()> {
+    if let Some((key, _)) = self.expiration.iter().min_by_key(|(_, &v)| v) {
+        let file_path = self.get_file_path(key);
+        let metadata = fs::metadata(&file_path)?;
+        let file_size = metadata.len();
+
+        fs::remove_file(&file_path)?;
+        self.size -= file_size;
+        self.expiration.remove(key);
+    }
+
+    Ok(())
 }
