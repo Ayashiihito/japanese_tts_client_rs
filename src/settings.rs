@@ -12,6 +12,7 @@ pub struct Settings {
     pub server_port: u16,
     pub server_address: String,
     pub storage_dir: String,
+    pub max_cache_size_mb: u64,
 }
 
 impl Settings {

@@ -1,3 +1,4 @@
 server_address = "localhost"
 server_port = 5000
 storage_dir = "./audio_cache"
+max_cache_size_mb = 300

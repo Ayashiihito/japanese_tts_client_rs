@@ -29,6 +29,8 @@ fn play(text: &str) -> Result<(), Box<dyn Error>> {
     println!("Time elapsed: {:?}", function_start.elapsed().unwrap());
 
     playback::play_audio(&audio_bytes)?;
+    fs_cache::remove_oldest()?;
+
     Ok(())
 }
 
