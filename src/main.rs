@@ -16,12 +16,13 @@ mod settings;
 mod util;
 
 fn play(text: &str) -> Result<(), Box<dyn Error>> {
-    println!("{}", text);
     let function_start = SystemTime::now();
 
     let audio_bytes = if fs_cache::has(&text) {
+        println!("Cache {text}");
         fs_cache::get(&text)
     } else {
+        println!("{text}");
         fs_cache::set(&text, &api::get_audio_bytes(text)?)
     }?;
 
