@@ -41,28 +41,18 @@ pub fn set<'a>(key: &str, value: &'a [u8]) -> io::Result<Vec<u8>> {
     Ok(value.to_vec())
 }
 
-pub fn remove_oldest() -> io::Result<()> {
-    let max_cache_size = ByteSize::mb(SETTINGS.max_cache_size_mb).as_u64();
+fn sort_files_by_creation_date(paths: Vec<fs::DirEntry>) -> io::Result<Vec<fs::DirEntry>> {
+    let mut sorted_paths = paths;
+    sorted_paths.sort_by_cached_key(|dir| dir.path().metadata()?.created()?);
+    Ok(sorted_paths)
+}
 
-    let store_dir = Path::new(&SETTINGS.storage_dir);
-    let mut current_cache_size = get_size(store_dir).unwrap();
-
-    if current_cache_size < max_cache_size {
-        return Ok(());
-    }
-
-    let mut paths: Vec<fs::DirEntry> = fs::read_dir(store_dir)
-        .unwrap()
-        .map(|dir_result| (dir_result.unwrap()))
-        .collect();
-
-    paths.sort_by_cached_key(|dir| dir.path().metadata().unwrap().created().unwrap());
-
+fn delete_files_until_size(paths: Vec<fs::DirEntry>, mut current_cache_size: u64, max_cache_size: u64) -> io::Result<u64> {
     for file_path in paths {
         if file_path
             .file_name()
             .into_string()
-            .unwrap()
+            .map_err(|_| io::Error::new(io::ErrorKind::Other, "Failed to convert filename to string"))?
             .contains(".gitkeep")
         {
             continue;
@@ -70,14 +60,34 @@ pub fn remove_oldest() -> io::Result<()> {
 
         fs::remove_file(&file_path.path())?;
 
-        let size_after_delete = current_cache_size - file_path.metadata().unwrap().len();
+        let size_after_delete = current_cache_size - file_path.metadata()?.len();
 
         if size_after_delete < max_cache_size {
-            break;
+            return Ok(size_after_delete);
         } else {
             current_cache_size = size_after_delete
         }
     }
+
+    Ok(current_cache_size)
+}
+
+pub fn remove_oldest() -> io::Result<()> {
+    let max_cache_size = ByteSize::mb(SETTINGS.max_cache_size_mb).as_u64();
+
+    let store_dir = Path::new(&SETTINGS.storage_dir);
+    let mut current_cache_size = get_size(store_dir)?;
+
+    if current_cache_size < max_cache_size {
+        return Ok(());
+    }
+
+    let paths: Vec<fs::DirEntry> = fs::read_dir(store_dir)?
+        .map(|dir_result| dir_result.map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?)
+        .collect();
+
+    let sorted_paths = sort_files_by_creation_date(paths)?;
+    let new_cache_size = delete_files_until_size(sorted_paths, current_cache_size, max_cache_size)?;
 
     Ok(())
 }
