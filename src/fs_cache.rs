@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::{fs, io};
 
-use data_encoding::BASE64;
+use data_encoding::HEXLOWER;
 use ring::digest::{digest, SHA256};
 
 use crate::settings::SETTINGS;
@@ -15,7 +15,7 @@ pub fn init() {
 fn get_file_path(key: &str) -> String {
     let key_digest = digest(&SHA256, key.as_bytes());
 
-    let key_hash = BASE64.encode(key_digest.as_ref());
+    let key_hash = HEXLOWER.encode(key_digest.as_ref());
     let dir = &SETTINGS.storage_dir;
 
     format!("{dir}/{key_hash}.wav")
@@ -28,6 +28,7 @@ pub fn get(key: &str) -> io::Result<Vec<u8>> {
 
 pub fn has(key: &str) -> bool {
     let file_path = get_file_path(key);
+
     Path::new(&file_path).exists()
 }
 
