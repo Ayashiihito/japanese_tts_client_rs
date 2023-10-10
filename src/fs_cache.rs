@@ -1,8 +1,8 @@
 use std::path::Path;
 use std::{fs, io};
 
-use crypto::digest::Digest;
-use crypto::sha1::Sha1;
+use data_encoding::BASE64;
+use ring::digest::{digest, SHA256};
 
 use crate::settings::SETTINGS;
 
@@ -13,14 +13,14 @@ pub fn init() {
 // Calling it every time is definitely suboptimal,
 // but I think it looks cleaner this way
 fn get_file_path(key: &str) -> String {
-    let mut hasher = Sha1::new();
-    hasher.input_str(key);
-    let key_hash = hasher.result_str();
+    let key_digest = digest(&SHA256, key.as_bytes());
 
-    format!("{}/{}.wav", &SETTINGS.storage_dir, key_hash)
+    let key_hash = BASE64.encode(key_digest.as_ref());
+    let dir = &SETTINGS.storage_dir;
+
+    format!("{dir}/{key_hash}.wav")
 }
 
-//TODO should be generic
 pub fn get(key: &str) -> io::Result<Vec<u8>> {
     let file_path = get_file_path(key);
     fs::read(Path::new(&file_path))
