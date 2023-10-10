@@ -1,6 +1,8 @@
 use config::{Config, ConfigError, File};
 use serde::Deserialize;
 
+const CONFIG_FILE_PATH: &str = "./config/config.toml";
+
 lazy_static! {
     pub static ref SETTINGS: Settings = Settings::new().expect("config can be loaded");
 }
@@ -12,12 +14,12 @@ pub struct Settings {
     pub storage_dir: String,
 }
 
-const CONFIG_FILE_PATH: &str = "./config/config.toml";
-
 impl Settings {
     pub fn new() -> Result<Self, ConfigError> {
-        let mut settings = Config::new();
-        settings.merge(File::with_name(CONFIG_FILE_PATH))?;
-        settings.try_into()
+        let settings = Config::builder()
+            .add_source(File::with_name(CONFIG_FILE_PATH))
+            .build()?;
+
+        settings.try_deserialize()
     }
 }

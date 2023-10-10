@@ -25,7 +25,7 @@ fn play(text: &str) -> Result<(), Box<dyn Error>> {
         fs_cache::set(&text, &api::get_audio_bytes(text)?)
     }?;
 
-    println!("Time elapsed: {:?}", function_start.elapsed());
+    println!("Time elapsed: {:?}", function_start.elapsed().unwrap());
 
     playback::play_audio(&audio_bytes)?;
     Ok(())
@@ -36,10 +36,11 @@ impl ClipboardHandler for Handler {
     fn on_clipboard_change(&mut self) -> CallbackResult {
         let mut ctx: ClipboardContext =
             ClipboardProvider::new().expect("Failed to obtain clipboard context");
+
         let text = match ctx.get_contents() {
             Ok(value) => value,
             Err(error) => {
-                eprintln!("Failed to read text from clipboard: {}", error);
+                eprintln!("Failed to read text from clipboard: {error}");
                 String::from("error")
             }
         };
@@ -47,7 +48,7 @@ impl ClipboardHandler for Handler {
         if util::is_japanese(&text) {
             match play(&text.trim()) {
                 Err(error) => {
-                    eprintln!("There was an error: {}", error)
+                    eprintln!("There was an error: {error}")
                 }
                 _ => {}
             }
@@ -57,7 +58,7 @@ impl ClipboardHandler for Handler {
     }
 
     fn on_clipboard_error(&mut self, error: io::Error) -> CallbackResult {
-        eprintln!("Error: {}", error);
+        eprintln!("Error: {error}");
         CallbackResult::Next
     }
 }
