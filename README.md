@@ -10,7 +10,7 @@ All generated audio is permanently stored inside of `audio_cache` folder as `.wa
 - [ ] Audio metadata (with copied text as the track's title)  
 - [-] Separate configuration file
 - - [x] Server address and port
-- - [ ] Max cache size and cache expiration
+- - [x] Max cache size 
 
 ### Supported platforms:
 - **Windows, Linux, MacOS**
