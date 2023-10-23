@@ -13,4 +13,4 @@ All generated audio is stored inside of `audio_cache` directory as `.wav` files 
 - - [x] Max cache size 
 
 ### Supported platforms:
-- **Windows, Linux, MacOS**
+- **Windows, Linux, MacOS (not tested, but should work)**
