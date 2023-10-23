@@ -3,7 +3,7 @@
 jtts is a program that uses machine learning text-to-speech to pronounce any Japanese text that you copy into the clipboard.  
 You need an instance of [jtts server](https://github.com/Ayashiihito/japanese_tts_server) running for it to work.
 
-All generated audio is permanently stored inside of `audio_cache` folder as `.wav` files with `SHA1` hash of the text as a title.
+All generated audio is stored inside of `audio_cache` directory as `.wav` files with `SHA256` hash of the text as a title.
 
 ### Planned features:
 - [x] Audio caching
